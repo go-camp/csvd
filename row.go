@@ -82,18 +82,20 @@ func (r *Row) Error() *RowError {
 //
 // If you want to get all parse errors, call the Error() method.
 func (r *Row) Parse(key string, parse func(val string) error) {
-	r.check()
-
 	idx, val := r.get(key)
 	var lastParseError *CellError
 	err := parse(val)
 	if err != nil {
-		line, _ := r.d.reader.FieldPos(idx)
+		line := -1
+		if idx != -1 {
+			line, _ = r.d.reader.FieldPos(idx)
+			idx += 1
+		}
 		lastParseError = &CellError{
 			Key:      key,
 			Val:      val,
 			Row:      r.d.rowNumber,
-			Column:   idx + 1,
+			Column:   idx,
 			Line:     line,
 			ParseErr: err,
 		}
