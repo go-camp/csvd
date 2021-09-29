@@ -13,13 +13,7 @@ import (
 )
 
 func ExampleDecoder() {
-	var csvFile = `
-User  \tName , Age
-invalid int,a
-good age , 18 
-too yong,17
-too old,121
-`
+	var csvFile = "User  \tName , Age\ninvalid int,a\ngood age , 18\ntoo yong,17\ntoo old,121\n"
 	r := bytes.NewReader([]byte(csvFile))
 	decoder, err := csvd.NewDecoder(csvd.Options{
 		Reader: csv.NewReader(r),
