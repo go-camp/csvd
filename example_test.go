@@ -13,6 +13,11 @@ import (
 )
 
 func ExampleDecoder() {
+	type User struct {
+		Name string
+		Age  int8
+	}
+
 	var csvFile = "User  \tName , Age\ninvalid int,a\ngood age , 18\ntoo yong,17\ntoo old,121\n"
 	r := bytes.NewReader([]byte(csvFile))
 	decoder, err := csvd.NewDecoder(csvd.Options{
@@ -23,6 +28,8 @@ func ExampleDecoder() {
 	}
 	decoder.ParseHeader()
 	for {
+		var user User
+
 		row, err := decoder.Next()
 		if err != nil {
 			if err == io.EOF {
@@ -30,7 +37,10 @@ func ExampleDecoder() {
 			}
 			panic(err)
 		}
+
 		row.Parse("user name", func(val string) error {
+			val = strings.TrimSpace(val)
+			user.Name = val
 			return nil
 		})
 		row.Parse("age", func(val string) error {
@@ -46,8 +56,10 @@ func ExampleDecoder() {
 			if age > 120 {
 				return errors.New("too old")
 			}
+			user.Age = int8(age)
 			return nil
 		})
+
 		if err := row.Error().Err(); err != nil {
 			fmt.Println(err)
 		}
